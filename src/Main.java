@@ -1,31 +1,21 @@
 public class Main {
     public static void main(String[] args) {
-        //Vehicle car = new Vehicle("Audi 7", 250.0, true, 0);
-        //car.refuel();
-        //car.checkFuel(car.getFuel());
-        //System.out.println("Топливо: " + car.checkFuel(car.getFuel()));
-        //car.drive();
-        //System.out.println("Топливо: " + car.checkFuel(car.getFuel()));
-        //SUV suv = new SUV("213", 223, true, 22, 4);
-        //suv.stop();
-        //suv.drive();
-        //System.out.println(suv.getCountWheels());
-        Vehicle suv1 = new SUV("213", 223, true, 22, 4);
-        Vehicle pscar1 = new PsCar("Audi 7", 250.0, true, 0);
-        Vehicle pscar2 = new PsCar("Audi 8" +
-                "", 250.0, true, 0);
-
-        Vehicle[] vehicles = {suv1, pscar1, pscar2};
+        Vehicle suv1 = new SUV("Mustang", 223, true, 42, 4);
+        Vehicle pscar1 = new PsCar("Lamgorgini", 250.0, true, 23);
+        Vehicle pscar2 = new PsCar("Audi 8", 200.0, true, 30);
+        Vehicle plane = new Plane("AirBus", 1000, false, 100);
+        Vehicle flycar = new FlyingCar("Dellorian", 500, false, 100);
+        Vehicle[] vehicles = {suv1, pscar1, pscar2, plane,flycar};
         TransportSorter ts = new TransportSorter(vehicles);
-        ts.print(vehicles);
         ts.sort(vehicles);
     }
-    public static class Vehicle{
+    public static abstract class Vehicle{
         private String model;
         private double speed;
         private boolean isDieselFuel;
         private int fuel;
         private int countWheels;
+
         public Vehicle(String model, double speed, boolean isDieselFuel, int fuel){
             this.model = model;
             this.speed = speed;
@@ -34,23 +24,8 @@ public class Main {
         }
         public Vehicle() {
         }
-        public void drive(){
-            System.out.println("Вы начали поездку");
-            for (fuel = checkFuel(getFuel()); fuel >= 0; fuel--){
-                if (getFuel() >= 0){
-                    System.out.println("Вы едите и сжигаете топливо " + getFuel());
-                } else if (getFuel() <= 0) {
-                    fuel = fuel + 1;
-                    break;
-                }
-                if (getFuel() == 0) {
-                    System.out.println("У вас кончилось топливо " + getFuel());
-                }
-            }
-        }
-        public void stop(){
-            System.out.println("Вы остановились");
-        }
+        abstract public void drive();
+        abstract public void stop();
         public String getModel() {
             return model;
         }
@@ -100,10 +75,10 @@ public class Main {
         }
         @Override
         public void drive(){
-            System.out.println("Ваш SUV разбился");
+            System.out.println("Ваш " + getModel() + " разбился");
         }
         public void stop(){
-            System.out.println("Тормоза отказали");
+            System.out.println("Тормоза " + getModel() + " отказали");
         }
         public void setCountWheels(int countWheels) {
             this.countWheels = countWheels;
@@ -111,18 +86,43 @@ public class Main {
         public int getCountWheels() {
             return countWheels;
         }
+
+        public String toString() {
+            return getModel() + " это корова";
+        }
     }
     public static class PsCar extends Vehicle{
         public PsCar(String model, double speed, boolean isDieselFuel, int fuel) {
             super(model, speed, isDieselFuel, fuel);
+        }
+        @Override
+        public void drive(){
+            System.out.println("Ваш Легкоавтомобиль спокойно едет");
+        }
+        public void stop(){
+            System.out.println("Вы остановились");
+        }
+
+        public String toString() {
+            return getModel() + " это легковая машина";
         }
     }
     public static class Cycle extends Vehicle {
         public Cycle(String model, double speed, boolean isDieselFuel, int fuel) {
             super(model, speed, isDieselFuel, fuel);
         }
+        public void drive(){
+            System.out.println("Ваш Легкоавтомобиль спокойно едет");
+        }
+        public void stop(){
+            System.out.println("Вы остановились");
+        }
+        public String toString() {
+            return getModel() + " это колесо";
+        }
+
     }
-    public static class TransportSorter extends Vehicle{
+    public static class TransportSorter extends Vehicle implements Flyable{
         public TransportSorter(Vehicle[] vehicles){
         }
         public void print(Vehicle[] vehicles){
@@ -132,12 +132,90 @@ public class Main {
         }
         public void sort(Vehicle[] vehicles){
             for(Vehicle it: vehicles){
-                if (it.getModel() == "213"){
-                    System.out.println("это число");
+                System.out.println(it.toString());
+                if (it instanceof Flyable){
+                    it.drive();
+                    if(it instanceof Flyable){
+                        ((Flyable) it).fly();
+                        System.out.println(it.getModel() + " взлетел");
+                    }
+                    System.out.println(it.getModel() + " отправляется в ангары воздушной техники");
+                    if (it instanceof  Flyable){
+                        ((Flyable) it).landing();
+                        System.out.println(it.getModel() + " совершил посадку");
+                    }
+                    it.stop();
                 } else {
-                    System.out.println("Транспортное средство " + it.getModel() + " отправляется туда то");
+                    System.out.println("Транспортное средство " + it.getModel() + " отправляется в дальнее путешествие");
                 }
             }
+        }
+        @Override
+        public void drive() {
+        }
+        @Override
+        public void stop() {
+        }
+
+        @Override
+        public void fly() {
+
+        }
+
+        @Override
+        public void landing() {
+
+        }
+    }
+    public interface Flyable {
+        void fly();
+        void landing();
+    }
+    public static class Plane extends Vehicle implements Flyable{
+        public Plane(String model, double speed, boolean isDieselFuel, int fuel) {
+            super(model, speed, isDieselFuel, fuel);
+        }
+        @Override
+        public void drive() {
+            System.out.println("Ваш " + getModel() + " начал разгон");
+        }
+
+        @Override
+        public void stop() {
+            System.out.println("Ваш " + getModel() + "  остановился");
+        }
+        @Override
+        public void fly() {
+        }
+        @Override
+        public void landing() {
+        }
+        public String toString() {
+            return getModel() + " это летающая птица";
+        }
+
+    }
+    public static class FlyingCar extends PsCar implements Flyable{
+        public FlyingCar(String model, double speed, boolean isDieselFuel, int fuel) {
+            super(model, speed, isDieselFuel, fuel);
+        }
+        @Override
+        public void drive() {
+            System.out.println("Ваша " + getModel() + " начала разгогрев");
+        }
+
+        @Override
+        public void stop() {
+            System.out.println("Ваша " + getModel() + " остановился");
+        }
+        @Override
+        public void fly() {
+        }
+        @Override
+        public void landing() {
+        }
+        public String toString() {
+            return getModel() + " это машина будущего";
         }
     }
 }
